@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn = "navigation_view">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_pomodoro"
+            android:icon="@drawable/nav_pomodoro"
+            android:title="Pomodoro Method"/>
+
+        <item
+            android:id="@+id/nav_blurting"
+            android:icon="@drawable/nav_blurting"
+            android:title="Blurting Method"/>
+
+        <item
+            android:id="@+id/nav_three_two_one"
+            android:icon="@drawable/nav_threetwoone"
+            android:title="321 Method"/>
+
+    </group>
+    <item
+        android:title="">
+
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/nav_logout"
+                android:title="@string/logout"/>
+        </menu>
+
+    </item>
+
+</menu>
