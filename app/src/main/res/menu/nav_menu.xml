@@ -8,19 +8,24 @@
         android:checkableBehavior="single">
 
         <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="@string/home"/>
+
+        <item
             android:id="@+id/nav_pomodoro"
             android:icon="@drawable/nav_pomodoro"
-            android:title="Pomodoro Method"/>
+            android:title="@string/pomodoromethod"/>
 
         <item
             android:id="@+id/nav_blurting"
             android:icon="@drawable/nav_blurting"
-            android:title="Blurting Method"/>
+            android:title="@string/blurting_method"/>
 
         <item
             android:id="@+id/nav_three_two_one"
             android:icon="@drawable/nav_threetwoone"
-            android:title="321 Method"/>
+            android:title="@string/threetwoonemethod"/>
 
     </group>
     <item

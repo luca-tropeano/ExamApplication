@@ -23,7 +23,8 @@
         android:minLines="3"
         android:gravity="center_vertical"
         android:minHeight="48dp"
-        tools:ignore="VisualLintTextFieldSize" />
+        tools:ignore="VisualLintTextFieldSize"
+        android:autofillHints="" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,7 +44,8 @@
         android:minLines="3"
         android:gravity="center_vertical"
         android:minHeight="48dp"
-        tools:ignore="VisualLintTextFieldSize" />
+        tools:ignore="VisualLintTextFieldSize"
+        android:autofillHints="" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -61,7 +63,8 @@
         android:minLines="3"
         android:gravity="center_vertical"
         android:minHeight="48dp"
-        tools:ignore="VisualLintTextFieldSize" />
+        tools:ignore="TextFields,VisualLintTextFieldSize"
+        android:autofillHints=""/>
 
     <Button
         android:id="@+id/saveButton"
