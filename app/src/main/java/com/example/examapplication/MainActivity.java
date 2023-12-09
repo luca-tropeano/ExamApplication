@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new PomodoroFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_pomodoro);
+                    .replace(R.id.fragment_container, new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
         }
     }
 
@@ -48,7 +48,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
 
-        if (itemId == R.id.nav_pomodoro) {
+        if (itemId == R.id.nav_home) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment()).commit();
+        } else if (itemId == R.id.nav_pomodoro) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new PomodoroFragment()).commit();
         } else if (itemId == R.id.nav_blurting) {

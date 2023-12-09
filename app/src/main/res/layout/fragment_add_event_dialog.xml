@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- EditText per il titolo dell'evento -->
+    <EditText
+        android:id="@+id/editTextTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Titolo dell'evento"
+        android:minHeight="48dp" />
+
+    <!-- EditText per la descrizione dell'evento -->
+    <EditText
+        android:id="@+id/editTextDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Descrizione dell'evento"
+        android:minHeight="48dp" />
+
+    <!-- DatePicker per la data di inizio dell'evento -->
+    <DatePicker
+        android:id="@+id/datePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- TimePicker per l'ora di inizio dell'evento -->
+    <TimePicker
+        android:id="@+id/timePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Aggiungi altri elementi UI se necessario -->
+
+    <Button
+        android:id="@+id/btnAddEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aggiungi Evento" />
+
+</LinearLayout>
