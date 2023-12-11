@@ -12,6 +12,7 @@
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
+
     <TextView
         android:id="@+id/timerTextView"
         android:layout_width="wrap_content"

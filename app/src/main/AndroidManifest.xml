@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
 
 
@@ -33,19 +34,26 @@
         </intent-filter>
     </activity>
 
+    <activity
+        android:name=".LoginActivity"
+        android:theme="@style/Theme.ExamApplication">
+    </activity>
 
-        <activity
-            android:name=".LoginActivity"
-            android:theme="@style/Theme.ExamApplication">
-        </activity>
+    <activity
+        android:name=".MainActivity"
+        android:theme="@style/Theme.ExamApplication"
+        android:exported="true">
+    </activity>
 
-        <activity
-            android:name=".MainActivity"
-            android:theme="@style/Theme.ExamApplication"
-            android:exported="true">
-        </activity>
+    <receiver
+        android:name="com.example.examapplication.DailyNotificationReceiver"
+        android:enabled="true"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+            <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+        </intent-filter>
+    </receiver>
 
-</application>
-
-
+    </application>
 </manifest>
