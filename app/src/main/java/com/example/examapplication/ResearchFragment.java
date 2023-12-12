@@ -1,26 +1,17 @@
 package com.example.examapplication;
 
-import android.util.Log;
-
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-
 import java.io.IOException;
-
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,20 +28,17 @@ public class ResearchFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_research, container, false);
 
         editTextSearch = view.findViewById(R.id.editTextSearch);
         searchButton = view.findViewById(R.id.searchButton);
         resultWebView = view.findViewById(R.id.resultWebView);
 
-        // Abilita l'esecuzione di JavaScript nel WebView
         resultWebView.getSettings().setJavaScriptEnabled(true);
 
         resultWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Abilita la navigazione all'interno del WebView
                 view.loadUrl(url);
                 return true;
             }
@@ -59,9 +47,8 @@ public class ResearchFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Esegui la ricerca quando il pulsante viene premuto
                 String searchTerm = editTextSearch.getText().toString();
-                Log.d("SearchFragment", "Termine di ricerca: " + searchTerm);
+                Log.d("SearchFragment", "Query di ricerca: " + searchTerm);
                 performSearch(searchTerm);
             }
         });
@@ -70,12 +57,11 @@ public class ResearchFragment extends Fragment {
     }
 
     private void performSearch(String query) {
-        // Mostra un indicatore di caricamento durante la ricerca
-        // E nascondilo quando la ricerca è completa
         resultWebView.loadData("Ricerca in corso...", "text/html", "UTF-8");
+        Log.d("SearchFragment", "Eseguo la ricerca con la query: " + query);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.googleapis.com/customsearch/v1?key=AIzaSyDI0ejE9j2HxzSxY0bdLVHvO5iqcpgKtJA&cx=1732f3bf1a653426d&q=carica")
+                .baseUrl("https://www.googleapis.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -89,33 +75,42 @@ public class ResearchFragment extends Fragment {
                     List<SearchResponse.Item> items = response.body().getItems();
 
                     if (items != null && !items.isEmpty()) {
-                        // Processa i risultati
+                        StringBuilder resultHtml = new StringBuilder();
+                        resultHtml.append("<html><body>");
+
                         for (SearchResponse.Item item : items) {
-                            Log.d("SearchFragment", "Titolo: " + item.getTitle() + ", Link: " + item.getLink());
+                            String title = item.getTitle();
+                            String link = item.getLink();
+                            resultHtml.append("<p><strong>").append(title).append("</strong><br>")
+                                    .append("<a href=\"").append(link).append("\">").append(link).append("</a></p>");
                         }
+
+                        resultHtml.append("</body></html>");
+
+                        resultWebView.loadData(resultHtml.toString(), "text/html", "UTF-8");
                     } else {
-                        // Nessun risultato trovato
                         Log.d("SearchFragment", "Nessun risultato trovato");
+                        Log.d("SearchFragment", "Risposta API: " + response.raw().toString());
+                        resultWebView.loadData("Nessun risultato trovato", "text/html", "UTF-8");
                     }
                 } else {
-                    // Gestisci errori di risposta HTTP
                     int statusCode = response.code();
                     Log.e("SearchFragment", "Errore nella ricerca. Codice: " + statusCode);
+                    Log.e("SearchFragment", "Risposta API: " + response.raw().toString());
 
-                    // Aggiungi log per visualizzare il corpo della risposta (se disponibile)
                     try {
                         String errorBody = response.errorBody().string();
                         Log.e("SearchFragment", "Corpo dell'errore: " + errorBody);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
+                    resultWebView.loadData("Errore nella ricerca", "text/html", "UTF-8");
                 }
             }
 
-
             @Override
             public void onFailure(Call<SearchResponse> call, Throwable t) {
-                // Gestisci errori di rete
                 resultWebView.loadData("Errore di rete", "text/html", "UTF-8");
             }
         });
