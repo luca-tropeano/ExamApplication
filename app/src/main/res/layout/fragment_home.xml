@@ -18,12 +18,17 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp" />
-
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calendarView"
+        android:text="Vuoi una notifica periodica?"/>
     <Button
         android:id="@+id/setReminderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/calendarView"
+        android:layout_below="@id/dateTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Imposta Orario Notifica" />

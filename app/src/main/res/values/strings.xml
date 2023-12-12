@@ -27,4 +27,6 @@
     <string name="blurting_method">Blurting Method</string>
     <string name="threetwoonemethod">321 Method</string>
     <string name="about_us_fragment">About Us Fragment</string>
+    <string name="research">Research</string>
+    <string name="buy_pro">Buy Pro</string>
 </resources>
