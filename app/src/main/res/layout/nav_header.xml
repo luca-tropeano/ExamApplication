@@ -25,21 +25,14 @@
 
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/navName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:text="Name"
-        android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/navEmail"
+        android:id="@+id/nav_header_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="20sp"
         android:textSize="14sp"
-        android:text="email" />
+        android:text="Email is not available" />
 
 </LinearLayout>

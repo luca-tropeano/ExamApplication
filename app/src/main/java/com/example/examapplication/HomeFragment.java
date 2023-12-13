@@ -25,7 +25,7 @@ import java.util.Calendar;
 
 public class HomeFragment extends Fragment {
 
-    private static final int REQUEST_WRITE_CALENDAR_PERMISSION = 1;
+
 
     @Nullable
     @Override
