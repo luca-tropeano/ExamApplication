@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
+import com.example.examapplication.R;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.nav_three_two_one) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new ThreeTwoOneFragment()).commit();
+        } else if (itemId == R.id.nav_research) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new ResearchFragment()).commit();
         } else if (itemId == R.id.nav_logout) {
             // Esegui il logout
             firebaseAuth.signOut();
@@ -74,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             // Chiudi l'Activity corrente
             finish();
+        } else if (itemId == R.id.nav_buy_pro) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new BuyProFragment()).commit();
         }
 
 

@@ -27,6 +27,12 @@
             android:icon="@drawable/nav_threetwoone"
             android:title="@string/threetwoonemethod"/>
 
+        <item
+            android:id="@+id/nav_research"
+            android:icon="@drawable/nav_research"
+            android:title="@string/research"/>
+
+
     </group>
     <item
         android:title="">
@@ -36,6 +42,18 @@
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/nav_logout"
                 android:title="@string/logout"/>
+        </menu>
+
+    </item>
+
+    <item
+        android:title="">
+
+        <menu>
+            <item
+                android:id="@+id/nav_buy_pro"
+                android:icon="@drawable/nav_buy_pro"
+                android:title="@string/buy_pro"/>
         </menu>
 
     </item>
