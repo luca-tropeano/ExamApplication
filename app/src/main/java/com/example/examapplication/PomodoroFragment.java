@@ -1,6 +1,5 @@
 package com.example.examapplication;
 
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -28,13 +27,16 @@ public class PomodoroFragment extends Fragment {
     private ImageView tomatoImageView;
     private GridLayout tomatoImagesGrid;
     private CountDownTimer countDownTimer;
-    private MediaPlayer mediaPlayer;
 
     private boolean shouldStartPomodoroAfterBreak = false;
     private boolean isTimerRunning = false;
 
     private int currentTimerType = 0; // 0: Pomodoro, 1: Short Break, 2: Long Break
     private int pomodoriCompleted = 0;
+
+    private boolean isShortBreakButtonEnabled = true;
+    private boolean isLongBreakButtonEnabled = true;
+    private boolean isPomodoroButtonEnabled = true;
 
     public PomodoroFragment() {
         // Required empty public constructor
@@ -53,33 +55,24 @@ public class PomodoroFragment extends Fragment {
         tomatoImageView = view.findViewById(R.id.tomatoImageView);
         tomatoImagesGrid = view.findViewById(R.id.tomatoImagesGrid);
 
-        // Inizializza il MediaPlayer
-        mediaPlayer = MediaPlayer.create(requireContext(), R.raw.alarm_buzzer);
-
-        startPomodoroButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isTimerRunning || currentTimerType != 0) {
-                    stopTimer();
-                    shouldStartPomodoroAfterBreak = false;  // Modifica
-                    startTimer(POMODORO_DURATION_MINUTES, 0);
-                }
-            }
-        });
-
         startShortBreakButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isTimerRunning || currentTimerType != 1) {
                     stopTimer();
 
-                    // Verifica se ci sono abbastanza pomodori completati per avviare la pausa breve
-                    if (pomodoriCompleted >= 3) {
-                        removeTomatoImages(3);
-                        startTimer(BREAK_DURATION_MINUTES, 1);
-                    } else {
-                        // Notifica o log che non ci sono abbastanza ic_tomato
-                        Log.e("PomodoroFragment", "Not enough ic_tomato for Short Break");
+                    if (isShortBreakButtonEnabled) {
+                        // Verifica se ci sono abbastanza pomodori completati per avviare la pausa breve
+                        if (pomodoriCompleted >= 3) {
+                            removeTomatoImages(3);
+                            startTimer(BREAK_DURATION_MINUTES, 1);
+
+                            // Disabilita gli altri pulsanti durante il timer
+                            disableButtons();
+                        } else {
+                            // Notifica o log che non ci sono abbastanza ic_tomato
+                            Log.e("PomodoroFragment", "Not enough ic_tomato for Short Break");
+                        }
                     }
                 }
             }
@@ -91,13 +84,35 @@ public class PomodoroFragment extends Fragment {
                 if (!isTimerRunning || currentTimerType != 2) {
                     stopTimer();
 
-                    // Verifica se ci sono abbastanza pomodori completati per avviare la pausa lunga
-                    if (pomodoriCompleted >= POMODORI_FOR_LONG_BREAK) {
-                        removeTomatoImages(POMODORI_FOR_LONG_BREAK);
-                        startTimer(LONG_BREAK_DURATION_MINUTES, 2);
-                    } else {
-                        // Notifica o log che non ci sono abbastanza ic_tomato
-                        Log.e("PomodoroFragment", "Not enough ic_tomato for Long Break");
+                    if (isLongBreakButtonEnabled) {
+                        // Verifica se ci sono abbastanza pomodori completati per avviare la pausa lunga
+                        if (pomodoriCompleted >= POMODORI_FOR_LONG_BREAK) {
+                            removeTomatoImages(POMODORI_FOR_LONG_BREAK);
+                            startTimer(LONG_BREAK_DURATION_MINUTES, 2);
+
+                            // Disabilita gli altri pulsanti durante il timer
+                            disableButtons();
+                        } else {
+                            // Notifica o log che non ci sono abbastanza ic_tomato
+                            Log.e("PomodoroFragment", "Not enough ic_tomato for Long Break");
+                        }
+                    }
+                }
+            }
+        });
+
+        startPomodoroButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isTimerRunning || currentTimerType != 0) {
+                    stopTimer();
+                    shouldStartPomodoroAfterBreak = false;  // Modifica
+
+                    if (isPomodoroButtonEnabled) {
+                        startTimer(POMODORO_DURATION_MINUTES, 0);
+
+                        // Disabilita gli altri pulsanti durante il timer
+                        disableButtons();
                     }
                 }
             }
@@ -118,17 +133,6 @@ public class PomodoroFragment extends Fragment {
             public void onFinish() {
                 timerTextView.setText("Timer expired");
                 isTimerRunning = false;
-
-                // Riproduci il suono quando il countdown finisce
-                mediaPlayer.start();
-
-                // Rilascia le risorse del MediaPlayer dopo la riproduzione
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                        mediaPlayer.release();
-                    }
-                });
 
                 // Show tomato image for completed pomodori
                 if (currentTimerType == 0) {
@@ -157,7 +161,6 @@ public class PomodoroFragment extends Fragment {
 
                         // Imposto il flag per iniziare il Pomodoro dopo una pausa breve
                         shouldStartPomodoroAfterBreak = true;
-                        // startTimer(LONG_BREAK_DURATION_MINUTES, 2);
                     }
                 }
 
@@ -169,6 +172,9 @@ public class PomodoroFragment extends Fragment {
                         shouldStartPomodoroAfterBreak = false; // Resetta il flag
                     }
                 }
+
+                // Riabilita i pulsanti
+                enableButtons();
             }
         }.start();
     }
@@ -190,10 +196,28 @@ public class PomodoroFragment extends Fragment {
     private void removeTomatoImages(int count) {
         int imagesToRemove = Math.min(count, tomatoImagesGrid.getChildCount());
 
-        for
-
-        (int i = 0; i < imagesToRemove; i++) {
+        for (int i = 0; i < imagesToRemove; i++) {
             tomatoImagesGrid.removeViewAt(0); // Rimuovi la prima immagine
         }
+    }
+
+    private void disableButtons() {
+        isShortBreakButtonEnabled = false;
+        isLongBreakButtonEnabled = false;
+        isPomodoroButtonEnabled = false;
+
+        startShortBreakButton.setEnabled(false);
+        startLongBreakButton.setEnabled(false);
+        startPomodoroButton.setEnabled(false);
+    }
+
+    private void enableButtons() {
+        isShortBreakButtonEnabled = true;
+        isLongBreakButtonEnabled = true;
+        isPomodoroButtonEnabled = true;
+
+        startShortBreakButton.setEnabled(true);
+        startLongBreakButton.setEnabled(true);
+        startPomodoroButton.setEnabled(true);
     }
 }
