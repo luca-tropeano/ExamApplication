@@ -3,8 +3,9 @@ package com.example.examapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
-import com.example.examapplication.R;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -12,11 +13,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
     private FirebaseAuth firebaseAuth;
+    private TextView userEmailTextView;
+    private TextView userNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Inizializza il riferimento ai TextView nell'header
+        View headerView = navigationView.getHeaderView(0);
+        userEmailTextView = headerView.findViewById(R.id.nav_header_email);
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.nav_open, R.string.nav_close
         );
@@ -42,6 +51,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
+        }
+
+        // Ottieni l'utente corrente e imposta il nome e l'email
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            String userEmail = user.getEmail();
+
+            // Imposta i valori nei TextView
+            userEmailTextView.setText(userEmail != null ? userEmail : "Email not available");
+
         }
     }
 
@@ -70,9 +89,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             // Avvia l'Activity di accesso (LoginActivity)
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-
-            // Chiudi tutte le attività precedenti nell'ordine dello stack
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
@@ -82,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new BuyProFragment()).commit();
         }
-
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
