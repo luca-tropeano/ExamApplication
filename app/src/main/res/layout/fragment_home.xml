@@ -29,4 +29,14 @@
         android:layout_marginTop="16dp"
         android:text="Imposta Orario Notifica" />
 
+  <TextView
+      android:id="@+id/reminderTimeTextView"
+      android:layout_below="@id/setReminderButton"
+      android:layout_centerHorizontal="true"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Orario non impostato"
+      android:textSize="18sp"
+      android:layout_marginTop="16dp"/>
+
 </RelativeLayout>

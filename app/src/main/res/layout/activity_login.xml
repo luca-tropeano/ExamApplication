@@ -45,7 +45,8 @@
                 android:drawableStart="@drawable/ic_person"
                 android:drawablePadding="8dp"
                 android:textColor="@color/black"
-                android:autofillHints="" />
+                android:autofillHints="emailAddress"
+                android:inputType="textEmailAddress" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -56,9 +57,10 @@
                 android:padding="8dp"
                 android:hint="@string/password"
                 android:inputType="textPassword"
-                android:drawableLeft="@drawable/ic_lock"
+                android:drawableStart="@drawable/ic_lock"
                 android:drawablePadding="8dp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:autofillHints="password" />
 
             <Button
                 android:layout_width="match_parent"

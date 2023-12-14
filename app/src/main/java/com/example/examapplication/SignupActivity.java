@@ -30,6 +30,16 @@ public class SignupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Controllo se l'utente è già autenticato
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            // L'utente è già autenticato, avvia MainActivity e chiudi SignupActivity
+            Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;  // Esce dal metodo se l'utente è già autenticato
+        }
         setContentView(R.layout.activity_sign_up);
 
         signupName = findViewById(R.id.signup_name);
@@ -45,6 +55,8 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Aggiorna l'URL del database
                 database = FirebaseDatabase.getInstance("https://examapplication-a6835-default-rtdb.europe-west1.firebasedatabase.app");
+                FirebaseDatabase.getInstance("https://examapplication-a6835-default-rtdb.europe-west1.firebasedatabase.app").setPersistenceEnabled(true);
+
                 reference = database.getReference("users");
 
                 String name = signupName.getText().toString();

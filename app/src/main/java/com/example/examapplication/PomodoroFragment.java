@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -63,8 +64,8 @@ public class PomodoroFragment extends Fragment {
 
                     if (isShortBreakButtonEnabled) {
                         // Verifica se ci sono abbastanza pomodori completati per avviare la pausa breve
-                        if (pomodoriCompleted >= 3) {
-                            removeTomatoImages(3);
+                        if (pomodoriCompleted >= 1) {
+                            removeTomatoImages(1);
                             startTimer(BREAK_DURATION_MINUTES, 1);
 
                             // Disabilita gli altri pulsanti durante il timer
@@ -72,6 +73,7 @@ public class PomodoroFragment extends Fragment {
                         } else {
                             // Notifica o log che non ci sono abbastanza ic_tomato
                             Log.e("PomodoroFragment", "Not enough ic_tomato for Short Break");
+                            Toast.makeText(requireContext(), "Not enough tomato for Short Break", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -95,6 +97,7 @@ public class PomodoroFragment extends Fragment {
                         } else {
                             // Notifica o log che non ci sono abbastanza ic_tomato
                             Log.e("PomodoroFragment", "Not enough ic_tomato for Long Break");
+                            Toast.makeText(requireContext(), "Not enough tomato for Long Break", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }

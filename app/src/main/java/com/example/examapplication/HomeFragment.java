@@ -1,31 +1,33 @@
-
 package com.example.examapplication;
 
-import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.example.examapplication.R;
-import com.example.examapplication.DailyNotificationReceiver;
 import android.widget.Button;
 import android.widget.TimePicker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import android.widget.TextView;
+import java.util.Locale;
+import android.app.AlarmManager;
 import java.util.Calendar;
 
 public class HomeFragment extends Fragment {
 
-
+    private TextView reminderTimeTextView;
 
     @Nullable
     @Override
@@ -43,6 +45,12 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // Trova il TextView per l'orario nel layout
+        reminderTimeTextView = rootView.findViewById(R.id.reminderTimeTextView);
+
+        // Visualizza l'orario salvato, se disponibile
+        displaySavedReminderTime();
+
         return rootView;
     }
 
@@ -55,14 +63,46 @@ public class HomeFragment extends Fragment {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         // Salva l'orario selezionato dall'utente
                         saveReminderTime(hourOfDay, minute);
-
-                        // Avvia la logica per la notifica giornaliera
-                        scheduleDailyNotification(hourOfDay, minute);
+                        // Visualizza immediatamente il nuovo orario
+                        displaySavedReminderTime();
+                        // Programma la notifica con il nuovo orario
+                        scheduleDailyNotification(requireContext(), hourOfDay, minute);
                     }
                 },
                 12, 0, false);
         timePickerDialog.show();
     }
+    private void scheduleDailyNotification(Context context, int hour, int minute) {
+        // Ottieni l'AlarmManager dal sistema Android
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // Calcola l'orario desiderato per la notifica giornaliera
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+
+        // Crea un intent per lanciare il BroadcastReceiver che gestirà la notifica
+        Intent intent = new Intent(context, DailyNotificationReceiver.class);
+
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        intent.putExtra("dayOfWeek", dayOfWeek);
+
+        // Crea un PendingIntent
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                0,  // requestCode
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        // Usa setExactAndAllowWhileIdle per garantire che la notifica venga inviata anche in modalità Doze
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        } else {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        }
+    }
+
 
     private void saveReminderTime(int hour, int minute) {
         // Salva l'orario selezionato dall'utente nelle preferenze con SharedPreferences
@@ -72,43 +112,18 @@ public class HomeFragment extends Fragment {
         editor.apply();
     }
 
-    private void scheduleDailyNotification(int hour, int minute) {
-        // Ottieni l'AlarmManager dal sistema Android
-        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+    private void displaySavedReminderTime() {
+        // Recupera l'orario salvato dalle preferenze
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        int hour = preferences.getInt("reminderHour", -1);
+        int minute = preferences.getInt("reminderMinute", -1);
 
-        // Calcola il tempo in millisecondi per la notifica giornaliera
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-
-        // Se l'orario è già passato oggi, imposta la notifica per domani
-        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        // Ripeti la notifica per ogni giorno della settimana
-        for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; dayOfWeek++) {
-            // Crea un intent per lanciare il BroadcastReceiver che gestirà la notifica
-            Intent intent = new Intent(requireContext(), DailyNotificationReceiver.class);
-
-            // Aggiungi dati extra per identificare il giorno della settimana
-            intent.putExtra("dayOfWeek", dayOfWeek);
-
-            // Aggiungi il flag FLAG_IMMUTABLE
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                    requireContext(),
-                    dayOfWeek,  // Usa il giorno della settimana come requestCode
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-            // Imposta la notifica giornaliera che si ripete ogni giorno
-            alarmManager.setRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY * 7,  // Intervallo settimanale
-                    pendingIntent
-            );
+        // Mostra l'orario nel TextView
+        if (hour != -1 && minute != -1) {
+            String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+            reminderTimeTextView.setText("Orario impostato: " + formattedTime);
+        } else {
+            reminderTimeTextView.setText("Orario non impostato");
         }
     }
 }
