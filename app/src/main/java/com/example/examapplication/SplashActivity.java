@@ -1,106 +1,53 @@
 package com.example.examapplication;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Toast;
-
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_TIME_OUT = 2000;
-    private static final int PERMISSION_REQUEST_CODE = 123;
+    // Codice di richiesta per il permesso di archiviazione
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 100;
+
+    // Array di permessi di archiviazione
+    private static final String[] STORAGE_PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // Verifica i permessi e richiedili se necessario
-        if (checkPermissions()) {
-            // Avvia l'handler dopo il ritardo
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // Avvia la MainActivity dopo il ritardo
-                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                    startActivity(intent);
-
-                    // Chiudi la SplashActivity
-                    finish();
-                }
-            }, SPLASH_TIME_OUT);
-        }
-    }
-
-    // Verifica i permessi
-    private boolean checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] permissions = {
-                    Manifest.permission.INTERNET,
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.SET_ALARM,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.RECEIVE_BOOT_COMPLETED
-
-            };
-
-            boolean allPermissionsGranted = true;
-
-            for (String permission : permissions) {
-                if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                    // Permesso mancante, richiedilo all'utente solo se non è già stato negato in precedenza
-                    if (shouldShowRequestPermissionRationale(permission)) {
-                        Toast.makeText(this, "I permessi sono necessari per il corretto funzionamento dell'applicazione", Toast.LENGTH_SHORT).show();
-                    }
-                    requestPermissions(new String[]{permission}, PERMISSION_REQUEST_CODE);
-                    allPermissionsGranted = false;
-                }
-            }
-
-            return allPermissionsGranted;
+        // Controlla se il permesso di ARCHIVIAZIONE è stato concesso
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Il permesso non è stato concesso, richiedilo
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST_CODE);
         } else {
-            // Versione di Android precedente a Marshmallow, i permessi sono inclusi nell'APK
-            return true;
+            // Il permesso è già stato concesso, avvia SignupActivity e chiudi SplashActivity
+            Intent intent = new Intent(this, SignupActivity.class);
+            startActivity(intent);
+            finish();
         }
-
     }
 
-    // Gestisce la risposta alla richiesta di permessi
+    // Gestisci il risultato della richiesta di permesso
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            boolean allPermissionsGranted = true;
-
-            for (int grantResult : grantResults) {
-                if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
-
-            if (allPermissionsGranted) {
-                // Permessi concessi, avvia l'handler dopo il ritardo
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Avvia SignUpActivity dopo il ritardo
-                        Intent intent = new Intent(SplashActivity.this, SignupActivity.class);
-                        startActivity(intent);
-
-                        // Chiudi la SplashActivity
-                        finish();
-                    }
-                }, SPLASH_TIME_OUT);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Il permesso di ARCHIVIAZIONE è stato concesso, avvia SignupActivity e chiudi SplashActivity
+                Intent intent = new Intent(this, SignupActivity.class);
+                startActivity(intent);
+                finish();
             } else {
-                // Permessi negati, esci dall'applicazione
+                // Il permesso è stato negato, mostra un messaggio Toast e chiudi l'applicazione
+                Toast.makeText(this, "Permesso negato", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }

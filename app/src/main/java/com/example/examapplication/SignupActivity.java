@@ -9,6 +9,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,6 +44,11 @@ public class SignupActivity extends AppCompatActivity {
             finish();
             return;  // Esce dal metodo se l'utente è già autenticato
         }
+
+        // Aggiorna l'URL del database e abilita la persistenza
+        database = FirebaseDatabase.getInstance("https://examapplication-a6835-default-rtdb.europe-west1.firebasedatabase.app");
+        database.setPersistenceEnabled(true);
+
         setContentView(R.layout.activity_sign_up);
 
         signupName = findViewById(R.id.signup_name);
@@ -53,16 +62,22 @@ public class SignupActivity extends AppCompatActivity {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Aggiorna l'URL del database
-                database = FirebaseDatabase.getInstance("https://examapplication-a6835-default-rtdb.europe-west1.firebasedatabase.app");
-                FirebaseDatabase.getInstance("https://examapplication-a6835-default-rtdb.europe-west1.firebasedatabase.app").setPersistenceEnabled(true);
-
-                reference = database.getReference("users");
-
                 String name = signupName.getText().toString();
                 String email = signupEmail.getText().toString();
                 String username = signupUsername.getText().toString();
                 String password = signupPassword.getText().toString();
+
+                // Validazione dell'email senza emoticon
+                if (!isValidEmail(email)) {
+                    Toast.makeText(SignupActivity.this, "Invalid email address", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Validazione della password senza emoticon
+                if (!isValidPassword(password)) {
+                    Toast.makeText(SignupActivity.this, "Invalid password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(SignupActivity.this, new OnCompleteListener<AuthResult>() {
@@ -73,9 +88,10 @@ public class SignupActivity extends AppCompatActivity {
                                     Log.d("FirebaseRegistration", "User registered successfully");
 
                                     // Ottieni l'ID dell'utente appena registrato
-                                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                    String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
                                     // Salva il nome, lo username e l'email nel nodo "users" nel tuo database Firebase
+                                    reference = database.getReference("users");
                                     User user = new User(name, username, email);
                                     reference.child("users").child(userId).setValue(user);
 
@@ -101,5 +117,21 @@ public class SignupActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private boolean isValidEmail(String email) {
+        // Utilizza un'espressione regolare per validare l'email
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        // Utilizza un'espressione regolare per validare la password (nessuna emoticon)
+        String passwordRegex = "^[^\\p{Emoji}]+$";
+        Pattern pattern = Pattern.compile(passwordRegex);
+        Matcher matcher = pattern.matcher(password);
+        return matcher.matches();
     }
 }
