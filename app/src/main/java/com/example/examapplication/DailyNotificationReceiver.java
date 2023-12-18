@@ -24,6 +24,9 @@ public class DailyNotificationReceiver extends BroadcastReceiver {
         String action = intent.getAction();
 
         if (Intent.ACTION_BOOT_COMPLETED.equals(action) || "android.intent.action.MY_PACKAGE_REPLACED".equals(action)) {
+
+            // Inizializza l'oggetto calendar
+            calendar = Calendar.getInstance();
             // Avvia la logica per la notifica giornaliera
             scheduleDailyNotification(context);
         } else {
@@ -85,8 +88,15 @@ public class DailyNotificationReceiver extends BroadcastReceiver {
 
             // Imposta la notifica giornaliera che si ripete ogni giorno
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                // Verifica se il dispositivo e l'app supportano gli allarmi esatti
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                } else {
+                    // Fallback a un'alternativa se gli allarmi esatti non sono supportati
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+                }
             } else {
+                // Versioni precedenti a Marshmallow
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
             }
         }
